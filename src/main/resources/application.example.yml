@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: java-spring-boot-auth-example
+  datasource:
+    driver-class-name: org.postgresql.Driver
+    username: username # database username
+    password: password # database password
+    url: jdbc:postgresql://localhost:5432/database # database URL
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  jackson:
+    property-naming-strategy: SNAKE_CASE
+
+common:
+  version: ${version}
+  env: release
+
+jwt:
+  secret: # jwt secret key
+  expiration: 2592000 # jwt expiration in seconds (30 days)
