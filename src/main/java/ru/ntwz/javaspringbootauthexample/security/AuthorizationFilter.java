@@ -22,6 +22,7 @@ import org.springframework.web.filter.OncePerRequestFilter;
 import ru.ntwz.javaspringbootauthexample.constant.AuthenticationConstant;
 import ru.ntwz.javaspringbootauthexample.dto.response.ApiError;
 import ru.ntwz.javaspringbootauthexample.exception.NotAuthorizedException;
+import ru.ntwz.javaspringbootauthexample.exception.JwtSignatureException;
 import ru.ntwz.javaspringbootauthexample.service.JwtService;
 
 import java.io.IOException;
@@ -90,7 +91,7 @@ public class AuthorizationFilter extends OncePerRequestFilter {
                 SecurityContextHolder.setContext(securityContext);
             }
             filterChain.doFilter(request, response);
-        } catch (NotAuthorizedException ex) {
+        } catch (NotAuthorizedException | JwtSignatureException ex) {
             ApiError apiError = new ApiError();
             apiError.setErrors(Collections.singletonList(ex.toString()));
             apiError.setReason("Not authorized to access this resource");

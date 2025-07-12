@@ -68,6 +68,17 @@ public class ExceptionController {
         return new ResponseEntity<>(apiError, HttpStatus.UNAUTHORIZED);
     }
 
+    @ExceptionHandler(JwtSignatureException.class)
+    public ResponseEntity<ApiError> handleJwtSignatureException(JwtSignatureException e) {
+        ApiError apiError = new ApiError();
+        apiError.setMessage(e.getMessage());
+        apiError.setStatus(HttpStatus.UNAUTHORIZED.name());
+        apiError.setReason("JWT signature verification failed");
+        apiError.setErrors(Collections.singletonList(e.toString()));
+
+        return new ResponseEntity<>(apiError, HttpStatus.UNAUTHORIZED);
+    }
+
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ApiError> handleGeneralException(Exception e) {
         ApiError apiError = new ApiError();
