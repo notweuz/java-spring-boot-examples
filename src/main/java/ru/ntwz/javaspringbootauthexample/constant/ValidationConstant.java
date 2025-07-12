@@ -14,10 +14,6 @@ public class ValidationConstant {
 
         public static final String REQUIRED = " is required";
 
-        public static final String SHOULD_BE_POSITIVE_OR_ZERO = " should be positive or zero";
-
-        public static final String SHOULD_BE_POSITIVE = " should be positive";
-
         public static final String WRONG_LENGTH = " should be between {min} and {max} characters";
 
         public static final String CAN_NOT_BE_BLANK = " can't be blank";

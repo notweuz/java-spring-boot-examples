@@ -29,11 +29,6 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String extractUsername(String token) {
-        return extractClaim(token, Claims::getSubject);
-    }
-
-    @Override
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
         if (userDetails instanceof User customUserDetails) {
@@ -49,6 +44,11 @@ public class JwtServiceImpl implements JwtService {
     public boolean validateToken(String token, UserDetails userDetails) {
         Long userId = extractUserId(token);
         String passwordHash = extractPasswordHash(token);
+
+        if (passwordHash == null) {
+            return false;
+        }
+
         if (userDetails instanceof User customUserDetails) {
             return userId.equals(customUserDetails.getId())
                     && passwordHash.equals(customUserDetails.getPassword())
@@ -60,18 +60,21 @@ public class JwtServiceImpl implements JwtService {
     @Override
     public Long extractUserId(String token) {
         Object id = extractClaim(token, claims -> claims.get("id"));
-        if (id instanceof Integer) {
-            return ((Integer) id).longValue();
-        } else if (id instanceof Long) {
-            return (Long) id;
-        } else if (id instanceof String) {
-            try {
-                return Long.parseLong((String) id);
-            } catch (NumberFormatException e) {
-                throw new InvalidTokenException("Invalid id in JWT token: " + id);
+        switch (id) {
+            case Integer i -> {
+                return i.longValue();
             }
-        } else {
-            throw new InvalidTokenException("User id not found in JWT token");
+            case Long l -> {
+                return l;
+            }
+            case String s -> {
+                try {
+                    return Long.parseLong(s);
+                } catch (NumberFormatException e) {
+                    throw new InvalidTokenException("Invalid id in JWT token: " + id);
+                }
+            }
+            case null, default -> throw new InvalidTokenException("User id not found in JWT token");
         }
     }
 
