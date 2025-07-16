@@ -45,6 +45,19 @@ This is a simple example of a Spring Boot application that uses JWT for authenti
   "password": "string"
 }
 ```
+### ChangePasswordDto
+```json
+{
+  "old_password": "string",
+  "new_password": "string"
+}
+```
+### UpdateUserDto
+```json
+{
+  "username": "string"
+}
+```
 
 ## Response DTOs
 ### AuthToken
