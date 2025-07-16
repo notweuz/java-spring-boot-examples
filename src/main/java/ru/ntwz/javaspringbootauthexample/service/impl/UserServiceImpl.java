@@ -6,12 +6,17 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.ntwz.javaspringbootauthexample.dto.mapper.UserMapper;
+import ru.ntwz.javaspringbootauthexample.dto.request.ChangePasswordDto;
+import ru.ntwz.javaspringbootauthexample.dto.response.AuthTokenDto;
 import ru.ntwz.javaspringbootauthexample.dto.response.UserDto;
+import ru.ntwz.javaspringbootauthexample.exception.InvalidPasswordException;
 import ru.ntwz.javaspringbootauthexample.exception.NotFoundException;
 import ru.ntwz.javaspringbootauthexample.exception.UserWithSameNameAlreadyExistsException;
 import ru.ntwz.javaspringbootauthexample.model.User;
 import ru.ntwz.javaspringbootauthexample.repository.UserRepository;
 import ru.ntwz.javaspringbootauthexample.security.CustomUserDetailsService;
+import ru.ntwz.javaspringbootauthexample.service.BCryptService;
+import ru.ntwz.javaspringbootauthexample.service.JwtService;
 import ru.ntwz.javaspringbootauthexample.service.UserService;
 
 @Slf4j
@@ -19,11 +24,20 @@ import ru.ntwz.javaspringbootauthexample.service.UserService;
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
     private final CustomUserDetailsService userDetailsService;
+    private final BCryptService bCryptService;
+    private final JwtService jwtService;
 
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, CustomUserDetailsService userDetailsService) {
+    public UserServiceImpl(
+            UserRepository userRepository,
+            CustomUserDetailsService userDetailsService,
+            BCryptService bCryptService,
+            JwtService jwtService
+    ) {
         this.userRepository = userRepository;
         this.userDetailsService = userDetailsService;
+        this.bCryptService = bCryptService;
+        this.jwtService = jwtService;
     }
 
     @Override
@@ -60,10 +74,25 @@ public class UserServiceImpl implements UserService {
         throw new NotFoundException("Current user not found.");
     }
 
-
     @Override
     public UserDto getCurrentUserInfo() {
         User user = getCurrentUser();
         return UserMapper.userDtoFromUser(user);
+    }
+
+    @Override
+    public AuthTokenDto changePassword(ChangePasswordDto changePasswordDto) {
+        String oldPassword = changePasswordDto.getOldPassword();
+        String newPassword = changePasswordDto.getNewPassword();
+
+        User user = getCurrentUser();
+        if (!bCryptService.verify(oldPassword, user.getPassword())) {
+            throw new InvalidPasswordException("Old password is incorrect.");
+        }
+        user.setPassword(bCryptService.getHash(newPassword));
+        userRepository.save(user);
+        String newToken = jwtService.generateToken(user);
+        log.info("Password changed for user: {}", user.getUsername());
+        return new AuthTokenDto(newToken);
     }
 }

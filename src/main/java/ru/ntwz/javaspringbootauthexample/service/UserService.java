@@ -1,5 +1,7 @@
 package ru.ntwz.javaspringbootauthexample.service;
 
+import ru.ntwz.javaspringbootauthexample.dto.request.ChangePasswordDto;
+import ru.ntwz.javaspringbootauthexample.dto.response.AuthTokenDto;
 import ru.ntwz.javaspringbootauthexample.dto.response.UserDto;
 import ru.ntwz.javaspringbootauthexample.model.User;
 import ru.ntwz.javaspringbootauthexample.security.CustomUserDetailsService;
@@ -17,4 +19,6 @@ public interface UserService {
     // Methods that return Dto
 
     UserDto getCurrentUserInfo();
+
+    AuthTokenDto changePassword(ChangePasswordDto changePasswordDto);
 }
