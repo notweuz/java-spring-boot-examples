@@ -23,6 +23,6 @@ public class SignUpDto {
     @Size(min = ValidationConstant.Length.PASSWORD_MIN, max = ValidationConstant.Length.PASSWORD_MAX,
             message = "Password" + ValidationConstant.Message.WRONG_LENGTH)
     @NotNull(message = "Password" + ValidationConstant.Message.REQUIRED)
-    @NotBlank(message = "Username" + ValidationConstant.Message.CAN_NOT_BE_BLANK)
+    @NotBlank(message = "Password" + ValidationConstant.Message.CAN_NOT_BE_BLANK)
     private String password;
 }
