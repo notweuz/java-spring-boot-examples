@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 import ru.ntwz.javaspringbootauthexample.dto.mapper.UserMapper;
 import ru.ntwz.javaspringbootauthexample.dto.request.ChangePasswordDto;
+import ru.ntwz.javaspringbootauthexample.dto.request.UserUpdateDto;
 import ru.ntwz.javaspringbootauthexample.dto.response.AuthTokenDto;
 import ru.ntwz.javaspringbootauthexample.dto.response.UserDto;
 import ru.ntwz.javaspringbootauthexample.exception.InvalidPasswordException;
@@ -77,6 +78,23 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserDto getCurrentUserInfo() {
         User user = getCurrentUser();
+        return UserMapper.userDtoFromUser(user);
+    }
+
+    @Override
+    public UserDto updateCurrentUser(UserUpdateDto userUpdateDto) {
+        User user = getCurrentUser();
+
+        if (userUpdateDto.getUsername() != null && !userUpdateDto.getUsername().equals(user.getUsername())) {
+            if (userRepository.findByUsername(userUpdateDto.getUsername()).isPresent()) {
+                log.warn("Cannot change username: user with username '{}' already exists.", userUpdateDto.getUsername());
+                throw new UserWithSameNameAlreadyExistsException("User with username '" + userUpdateDto.getUsername() + "' already exists.");
+            }
+            user.setUsername(userUpdateDto.getUsername());
+        }
+
+        userRepository.save(user);
+        log.info("User info updated for user: {}", user.getUsername());
         return UserMapper.userDtoFromUser(user);
     }
 

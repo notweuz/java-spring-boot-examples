@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.ntwz.javaspringbootauthexample.dto.request.ChangePasswordDto;
+import ru.ntwz.javaspringbootauthexample.dto.request.UserUpdateDto;
 import ru.ntwz.javaspringbootauthexample.dto.response.AuthTokenDto;
 import ru.ntwz.javaspringbootauthexample.dto.response.UserDto;
 import ru.ntwz.javaspringbootauthexample.service.UserService;
@@ -32,5 +33,13 @@ public class UserController {
     ) {
         log.info("Received request to change password for current user");
         return userService.changePassword(changePasswordDto);
+    }
+
+    @PatchMapping("/@me")
+    public UserDto updateCurrentUser(
+            @Valid @RequestBody UserUpdateDto userUpdateDto
+    ) {
+        log.info("Received request to update current user info");
+        return userService.updateCurrentUser(userUpdateDto);
     }
 }
